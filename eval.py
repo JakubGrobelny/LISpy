@@ -5,9 +5,23 @@
 
 import types
 
-# parses user input into symbol list
+# deleting useless whitespace characters
+def preparse(str):
+
+    str = str.replace('\n', " ")
+    str = str.replace('\t', " ")
+    str = str.replace('\v', " ")
+    str = str.replace('\f', " ")
+    str = str.replace('\r', " ")
+
+    while "  " in str:
+        str = str.replace("  ", " ")
+
+    return str
+
+# parses s-expressions into lists
 def parse(str):
-    out = []
+
     if "(" not in str and ")" not in str:
         if " " in str:
             raise Exception("Incorrect input!")
@@ -15,42 +29,51 @@ def parse(str):
             return str
     else:
         str = str[1:-1]
-        tempstr = ""
         result = []
+
         nested = False
         nestCount = 0
+        tempstr = ""
+
         for c in str:
-            if (c != " "):  
+            if (c != ' '):
                 tempstr += c
-                if c == "(":
+                if c == '(':
                     nested = True
                     nestCount += 1
-                elif c == ")":
+                elif c == ')':
                     nestCount -= 1
                     if nestCount == 0:
                         result.append(parse(tempstr))
                         tempstr = ""
                         nested = False
             elif not nested:
-                result.append(tempstr)
-                tempstr = ""
+                if tempstr != "":
+                    result.append(tempstr)
+                    tempstr = ""
             elif nested:
-                tempstr += " "
+                tempstr += ' '
+
+    if tempstr != "":
+        result.append(tempstr)
+        
     return result
 
 # evaluates given expression in given environment
 def eval(expr, env):
+
     return 0 #TODO:
 
 def interpreter_loop():
     exit = False
     globalEnv = {}
+    #TODO: load and eval a file before entering interpreter loop
     while not exit:
         userInput = input()
-        if userInput == "exit":
+        if userInput == "#exit":
             exit = True
         else:
-            print(parse(userInput))
-            #eval(parse(userInput), globalEnv)
+            print(parse(preparse(userInput)))
+            #print(eval(parse(preparse(userInput)), globalEnv))
 
 interpreter_loop()
