@@ -198,6 +198,11 @@ def mod(args, env):
     
     return lispEval(args[0], env) % lispEval(args[1], env)
     
+end = False
+def exit(args, env):
+    global end
+    end = True
+
 def globalEnvInit():
 
     return {"+" : plus,     \
@@ -206,7 +211,8 @@ def globalEnvInit():
             "/" : div,      \
             "=" : equal,    \
             ">" : greater,  \
-            "modulo" : mod
+            "modulo" : mod, \
+            "exit" : exit
                             }
 ##############
 #    MAIN    #
@@ -214,7 +220,6 @@ def globalEnvInit():
 
 def interpreter_loop():
 
-    exit = False
     globalEnv = globalEnvInit()
 
     if len(sys.argv):
@@ -238,16 +243,13 @@ def interpreter_loop():
             print("Failed to open " + sys.argv[1])
 
     #TODO: load and eval a file before entering interpreter loop
-    while not exit:
+    while not end:
         userInput = input("> ")
-        if userInput == "#exit":
-            exit = True
-        else:
-            try:
-                val = lispEval(parse(preparse(userInput)), globalEnv)
-                if val != None:
-                    print(val)
-            except Exception as exc:
-                print(exc)
+        try:
+            val = lispEval(parse(preparse(userInput)), globalEnv)
+            if val != None:
+                print(val)
+        except Exception as exc:
+            print(exc)
 
 interpreter_loop()
