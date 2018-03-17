@@ -35,6 +35,9 @@ def parse(str):
         nestCount = 0
         tempstr = ""
 
+        #TODO:
+        # do quotations
+
         for c in str:
             if (c != ' '):
                 tempstr += c
@@ -93,14 +96,37 @@ def lispEval(expr, env):
         else:
             return env[expr]
     else:
+
         if expr[0] == "define":
+            #TODO:
+            # Fix defines inside of another defines
+            # Also make it impossible to define keywords
             if len(expr) == 3:
                 env.update({expr[1] : lispEval(expr[2], env)})
             else:
-                raise Exception("Invalid use of 'define'")
+                raise Exception("Invalid use of 'define'!")
+
+        if expr[0] == "if":
+            if len(expr) != 4:
+                raise Exception("Invalid use of 'if'!")
+            else:
+                if not lispEval(expr[1], env):
+                    return lispEval(expr[3], env)
+                else:
+                    return lispEval(expr[2], env)
+
+        if expr[0] == "cons":
+            #TODO:
+            # Redo cons because it's 2 am and it probably sucks
+            if len(expr) != 3:
+                raise Exception("Invalid use of 'cons'!")
+            else:
+                return lispEval(expr[1], env) , lispEval(expr[2], env)
+
         elif expr[0] in env:
             if isinstance(env[expr[0]], types.FunctionType):
                 return env[expr[0]](expr[1:], env)
+
         else:
             raise Exception('(' + ' '.join(expr) + ')' + " is not a valid expression!")
 
