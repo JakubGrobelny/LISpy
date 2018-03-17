@@ -85,6 +85,9 @@ def lispEval(expr, env):
                     return True
             return False
 
+        #TODO: elif expr[0] == "lambda":
+        # lambdas will need own local environments
+
         elif expr[0] == "cons":
             #TODO:
             # Redo cons because it's 2 am and it probably sucks
@@ -175,7 +178,7 @@ def mod(args, env):
         raise Exception("modulo: arity mismatch!")
     
     return lispEval(args[0], env) % lispEval(args[1], env)
-
+    
 def globalEnvInit():
 
     return {"+" : plus,     \
@@ -184,7 +187,8 @@ def globalEnvInit():
             "/" : div,      \
             "=" : equal,    \
             ">" : greater,  \
-            "modulo" : mod}
+            "modulo" : mod
+                            }
 
 # MAIN
 def interpreter_loop():
