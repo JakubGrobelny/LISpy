@@ -4,6 +4,7 @@
 
 import types
 import sys
+from pair import pair
 from parser import parse
 from parser import preparse
 
@@ -41,9 +42,13 @@ def lispEval(expr, env):
         except:
             return False
 
+    basic = {int, float, pair}
+
     # if the expression is not a list
     if not isinstance(expr, list):
         if not expr in env:
+            if type(expr) in basic:
+                return expr
             # boolean types
             if expr == "false" or expr == "#f":
                 return False
@@ -115,10 +120,6 @@ def lispEval(expr, env):
 
         #TODO: elif expr[0] == "lambda":
         # lambdas will need own local environments
-        
-        #TODO: elif expr[0] == "cons":
-        #TODO: elif expr[0] == "car":
-        #TODO: elif expr[0] == "cdr":        
 
         # calculating operator
         elif type(expr[0]) == list:
@@ -130,7 +131,7 @@ def lispEval(expr, env):
             except:
                 args = []
 
-            try:    
+            try:
                 return op(args, env)
             except:
                 raise Exception(op.__name__ + ": arity mismatch!")

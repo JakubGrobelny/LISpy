@@ -4,6 +4,7 @@
 
 import sys
 from leval import lispEval
+from pair import pair
 
 # global variable used to determine whether the program should close
 end = False
@@ -91,6 +92,30 @@ def exit(args, env):
     global end
     end = True
 
+def cons(args, env):
+    if len(args) != 2:
+        raise Exception("cons: arity mismatch!")
+    else:
+        return pair(lispEval(args[0], env), lispEval(args[1], env))
+
+def car(args, env):
+    if len(args) != 1:
+        raise Exception("car: arity mismatch!")
+    p = lispEval(args[0], env)
+    if type(p) != pair:
+        raise Exception("car: expected pair, got " + type(p).__name__)
+    else:
+        return lispEval(p.get(0), env)
+
+def cdr(args, env):
+    if len(args) != 1:
+        raise Exception("cdr: arity mismatch!")
+    p = lispEval(args[0], env)
+    if type(p) != pair:
+        raise Exception("cdr: expected pair, got " + type(p).__name__)
+    else:
+        return lispEval(p.get(1), env)
+
 def globalEnvInit():
 
     # build in definitions
@@ -101,5 +126,8 @@ def globalEnvInit():
             "=" : equal,    \
             ">" : greater,  \
             "modulo" : mod, \
-            "exit" : exit
+            "exit" : exit,  \
+            "cons" : cons,  \
+            "car" : car,    \
+            "cdr" : cdr
                             }
