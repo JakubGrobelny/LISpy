@@ -41,28 +41,36 @@ def parse(str):
         # 2. use any type of brackets
 
         for c in str:
+
             if (c != ' '):
+
                 tempstr += c
                 if c == '"':
+                    
                     if not readingStr:
                         readingStr = True
+                        
                     else:
                         readingStr = False
                         result.append(tempstr)
                         tempstr = ""
+
                 elif c == '(':
                     nested = True
                     nestCount += 1
+
                 elif c == ')':
                     nestCount -= 1
                     if nestCount == 0:
                         result.append(parse(tempstr))
                         tempstr = ""
                         nested = False
+
             elif not nested and not readingStr:
                 if tempstr != "":
                     result.append(tempstr)
                     tempstr = ""
+
             elif nested or readingStr:
                 tempstr += ' '
 

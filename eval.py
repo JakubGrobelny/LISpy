@@ -26,6 +26,16 @@ def lispEval(expr, env):
         except:
             return False
 
+    def isString(str):
+        try:
+            if str[0] == str[-1] == '"':
+                return True
+            return False
+        except:
+            return False
+
+    specialForms = ["define", "if", "cond", "and", "or", "cons", "car", "cdr"]
+
     if not isinstance(expr, list):
         if not expr in env:
             if expr == "false" or expr == "#f":
@@ -51,10 +61,13 @@ def lispEval(expr, env):
         if expr[0] == "define":
             #TODO:
             # Fix defines inside of another defines
-            # Also make it impossible to define keywords
-            # Also make it impossible to define values
             if len(expr) == 3:
-                env.update({expr[1] : lispEval(expr[2], env)})
+                if isFloat(expr[1]) or isInt(expr[1]) or isString(expr[1]):
+                    raise Exception("Can not define a value!")
+                elif expr[1] in specialForms:
+                    raise Exception("Can not define a keyword!")
+                else:
+                    env.update({expr[1] : lispEval(expr[2], env)})
             else:
                 raise Exception("Invalid use of 'define'!")
 
@@ -124,6 +137,7 @@ def lispEval(expr, env):
 ####################
 # Basic procedures #
 ####################
+#TODO: expand them to work with strings and stuff
 
 def plus(args, env):
 
