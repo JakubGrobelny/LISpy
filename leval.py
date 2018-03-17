@@ -1,9 +1,15 @@
 #file --leval--
+# Jakub Grobelny
+# 2018
 
 import types
 import sys
 from parser import parse
 from parser import preparse
+
+#####################
+#   EVAL FUNCTION   #
+#####################
 
 # list of special forms used to check whether an use of 'define' is legal
 specialForms = ["define", "if", "cond", "and", "or", "cons", "car", "cdr"]
@@ -131,6 +137,20 @@ def lispEval(expr, env):
                 return lispEval(expr[1][1], env)
             else:
                 raise Exception("Expression  is not a pair!")
+
+        # calculating operator
+        elif type(expr[0]) == list:
+            op = lispEval(expr[0], env)
+
+            try:
+                args = expr[1:]
+            except:
+                args = []
+
+            try:    
+                return op(args, env)
+            except:
+                raise Exception(op.__name__ + ": arity mismatch!")
 
         # searching for operator in the environment
         elif expr[0] in env:

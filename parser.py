@@ -1,6 +1,12 @@
 #file --parser--
+# Jakub Grobelny
+# 2018
 
 import re
+
+##############
+#   PARSER   #
+##############
 
 # deleting useless whitespace characters and comments
 def preparse(str):

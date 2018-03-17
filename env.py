@@ -1,4 +1,6 @@
 #file --env--
+# Jakub Grobelny
+# 2018
 
 import sys
 from leval import lispEval

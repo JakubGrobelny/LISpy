@@ -8,7 +8,7 @@ from env import globalEnvInit, lispEval
 from parser import parse, preparse
 import sys
 
-#############
+##############
 #    MAIN    #
 ##############
 
