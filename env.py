@@ -116,6 +116,12 @@ def cdr(args, env):
     else:
         return lispEval(p.get(1), env)
 
+def list(args, env):
+    if len(args) == 0:
+        return "null"
+    else:
+        return cons([args[0], list(args[1:], env)], env)
+
 def globalEnvInit():
 
     # build in definitions
@@ -129,5 +135,6 @@ def globalEnvInit():
             "exit" : exit,  \
             "cons" : cons,  \
             "car" : car,    \
-            "cdr" : cdr
+            "cdr" : cdr,    \
+            "list" : list,
                             }
