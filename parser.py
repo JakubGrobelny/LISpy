@@ -1,7 +1,12 @@
 #file --parser.py--
 
-# deleting useless whitespace characters
+import re
+
+# deleting useless whitespace characters and comments
 def preparse(str):
+
+    # removing comments
+    str = re.sub(r'\;.+\n', '', str)
 
     str = str.replace('\n', " ")
     str = str.replace('\t', " ")
