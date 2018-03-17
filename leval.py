@@ -49,6 +49,8 @@ def lispEval(expr, env):
                 return False
             if expr == "true" or expr == "#t":
                 return True
+            if expr == "null":
+                return "null"
             # quotes (and characters)
             if expr[0] == '\'':
                 return expr
@@ -114,32 +116,13 @@ def lispEval(expr, env):
         #TODO: elif expr[0] == "lambda":
         # lambdas will need own local environments
         
-        elif expr[0] == "cons":
-            #TODO:
-            # Redo cons because it's 2 am and it probably sucks
-            if len(expr) != 3:
-                raise Exception("Invalid use of 'cons'!")
-            else:
-                return lispEval(expr[1], env), lispEval(expr[2], env)
-
-        elif expr[0] == "car":
-            if len(expr) != 2:
-                raise Exception("Invalid use of 'car'!")
-            elif isinstance(expr[1], tuple):
-                return lispEval(expr[1][0], env)
-            else:
-                raise Exception("Expression is not a pair!")
-
-        elif expr[0] == "cdr":
-            if len(expr) != 2:
-                raise Exception("Invalid use of 'cdr'!")
-            elif isinstance(expr[1], tuple):
-                return lispEval(expr[1][1], env)
-            else:
-                raise Exception("Expression  is not a pair!")
+        #TODO: elif expr[0] == "cons":
+        #TODO: elif expr[0] == "car":
+        #TODO: elif expr[0] == "cdr":        
 
         # calculating operator
         elif type(expr[0]) == list:
+
             op = lispEval(expr[0], env)
 
             try:
