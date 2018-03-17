@@ -98,15 +98,15 @@ def lispEval(expr, env):
                 env.update({expr[1] : lispEval(expr[2], env)})
             else:
                 raise Exception("Invalid use of 'define'")
-        #elif isinstance(expr[0], types.FunctionType):
-        #    expr()
+        elif expr[0] in env:
+            if isinstance(env[expr[0]], types.FunctionType):
+                return env[expr[0]](expr[1:], env)
         else:
-            raise Exception("Invalid expression!")
+            raise Exception('(' + ' '.join(expr) + ')' + " is not a valid expression!")
         
-
 def interpreter_loop():
     exit = False
-    globalEnv = {}
+    globalEnv = {"+" : plus}
     #TODO: load and eval a file before entering interpreter loop
     while not exit:
         userInput = input()
@@ -117,5 +117,13 @@ def interpreter_loop():
             val = (lispEval(parse(preparse(userInput)), globalEnv))
             if val:
                 print(val)
+
+# Basic procedures:
+
+def plus(args, env):
+    sum = 0
+    for arg in args:
+        sum += lispEval(arg, env)
+    return sum
 
 interpreter_loop()
