@@ -106,7 +106,7 @@ def lispEval(expr, env):
             else:
                 raise Exception("Invalid use of 'define'!")
 
-        if expr[0] == "if":
+        elif expr[0] == "if":
             if len(expr) != 4:
                 raise Exception("Invalid use of 'if'!")
             else:
@@ -115,7 +115,7 @@ def lispEval(expr, env):
                 else:
                     return lispEval(expr[2], env)
 
-        if expr[0] == "cons":
+        elif expr[0] == "cons":
             #TODO:
             # Redo cons because it's 2 am and it probably sucks
             if len(expr) != 3:
@@ -125,7 +125,7 @@ def lispEval(expr, env):
 
         elif expr[0] in env:
             if isinstance(env[expr[0]], types.FunctionType):
-                return env[expr[0]](expr[1:], env)
+                return lispEval(expr[0], env)(expr[1:], env)
 
         else:
             raise Exception('(' + ' '.join(expr) + ')' + " is not a valid expression!")
