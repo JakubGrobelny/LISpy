@@ -1,17 +1,18 @@
-#file --eval.py--
-
-# Jakub Grobelny
-# 2018
-# Something like LISP
-# probably
+#file --leval--
 
 import types
-from parser import *
 import sys
+from parser import parse
+from parser import preparse
+
+# list of special forms used to check whether an use of 'define' is legal
+specialForms = ["define", "if", "cond", "and", "or", "cons", "car", "cdr"]
 
 # evaluates given expression in given environment
 def lispEval(expr, env):
 
+    # since every element in a list is a string at the beginning
+    # we need to check if it's convertable to a certain type
     def isInt(str):
         try:
             int(str)
@@ -34,10 +35,10 @@ def lispEval(expr, env):
         except:
             return False
 
-    specialForms = ["define", "if", "cond", "and", "or", "cons", "car", "cdr"]
-
+    # if the expression is not a list
     if not isinstance(expr, list):
         if not expr in env:
+            # boolean types
             if expr == "false" or expr == "#f":
                 return False
             if expr == "true" or expr == "#t":
@@ -48,16 +49,20 @@ def lispEval(expr, env):
             # symbols are strings so we return string
             if expr[0] == expr[-1] == '\"':
                 return expr
+            # int
             elif isInt(expr):
                 return int(expr)
+            # float
             elif isFloat(expr):
                 return float(expr)
             else:
                 raise Exception(expr + " is of unknown type!")
         else:
             return env[expr]
+    # else if the expression is a list
     else:
 
+        # checking for special forms first
         if expr[0] == "define":
             #TODO:
             # Fix defines inside of another defines
@@ -127,144 +132,11 @@ def lispEval(expr, env):
             else:
                 raise Exception("Expression  is not a pair!")
 
+        # searching for operator in the environment
         elif expr[0] in env:
             if isinstance(env[expr[0]], types.FunctionType):
                 return lispEval(expr[0], env)(expr[1:], env)
 
+        # expression was invalid
         else:
             raise Exception('(' + ' '.join(expr) + ')' + " is not a valid expression!")
-
-####################
-# Basic procedures #
-####################
-#TODO: expand them to work with strings and stuff
-
-def plus(args, env):
-
-    sum = 0
-    for arg in args:
-        sum += lispEval(arg, env)
-    return sum
-
-def minus(args, env):
-
-    if len(args) == 1:
-            return -lispEval(args[0], env)
-    elif len(args) > 0:
-        sum = lispEval(args[0], env)
-    else:
-        raise Exception("-: arity mismatch!")
-
-    for arg in args[1:]:
-        sum -= lispEval(arg, env)
-
-    return sum
-
-def mult(args, env):
-
-    prod = 1
-    for arg in args:
-        prod *= lispEval(arg, env)
-    return prod
-
-def div(args, env):
-
-    if len(args) == 1:
-        return 1 / lispEval(args[0], env)
-    elif len(args) > 0:
-        quot = lispEval(args[0], env)
-    else:
-        raise Exception("/: arity mismatch!")
-
-    for arg in args[1:]:
-        quot /= lispEval(arg, env)
-
-    return quot
-
-def equal(args, env):
-
-    if not args:
-        raise Exception("=: arity mismatch!")
-    prev = lispEval(args[0], env)
-
-    for arg in args[1:]:
-        if (lispEval(arg, env) != prev):
-            return False
-        prev = lispEval(arg, env)
-
-    return True
-
-def greater(args, env):
-
-    if len(args) < 2:
-        raise Exception(">: arity mismatch!")
-    
-    first = lispEval(args[0], env)
-
-    for arg in args[1:]:
-        if (lispEval(arg, env) >= first):
-            return False
-    return True
-
-def mod(args, env):
-  
-    if len(args) != 2:
-        raise Exception("modulo: arity mismatch!")
-    
-    return lispEval(args[0], env) % lispEval(args[1], env)
-    
-end = False
-def exit(args, env):
-    global end
-    end = True
-
-def globalEnvInit():
-
-    return {"+" : plus,     \
-            "-" : minus,    \
-            "*" : mult,     \
-            "/" : div,      \
-            "=" : equal,    \
-            ">" : greater,  \
-            "modulo" : mod, \
-            "exit" : exit
-                            }
-##############
-#    MAIN    #
-##############
-
-def interpreter_loop():
-
-    globalEnv = globalEnvInit()
-
-    if len(sys.argv):
-        try:
-            for arg in sys.argv[1:]:
-                with open(arg, 'r') as file:
-                    program = file.read()
-                    program = preparse(program)
-                    program = "(" + program + ")"
-                    expressions = parse(program)
-
-                    for expr in expressions:
-                        try:
-                            val = lispEval(expr, globalEnv)
-                            if val != None:
-                                print(val)
-                        except Exception as exc:
-                            print(exc)
-
-        except:
-            print("Failed to open " + sys.argv[1])
-
-    #TODO: load and eval a file before entering interpreter loop
-    while not end:
-        userInput = input("> ")
-        try:
-            val = lispEval(parse(preparse(userInput)), globalEnv)
-            if val != None:
-                print(val)
-        except Exception as exc:
-            print(exc)
-
-interpreter_loop()
