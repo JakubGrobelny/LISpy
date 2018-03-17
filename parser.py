@@ -23,7 +23,7 @@ def preparse(str):
 def parse(str):
 
     if "(" not in str and ")" not in str:
-        if " " in str:
+        if " " in str and str[0] != '"' != str[-1]:
             raise Exception("Incorrect input!")
         else: 
             return str
@@ -34,16 +34,23 @@ def parse(str):
         nested = False
         nestCount = 0
         tempstr = ""
+        readingStr = False
 
         #TODO:
         # 1. do quotations
         # 2. use any type of brackets
-        # 3. strings break at spaces
 
         for c in str:
             if (c != ' '):
                 tempstr += c
-                if c == '(':
+                if c == '"':
+                    if not readingStr:
+                        readingStr = True
+                    else:
+                        readingStr = False
+                        result.append(tempstr)
+                        tempstr = ""
+                elif c == '(':
                     nested = True
                     nestCount += 1
                 elif c == ')':
@@ -52,14 +59,14 @@ def parse(str):
                         result.append(parse(tempstr))
                         tempstr = ""
                         nested = False
-            elif not nested:
+            elif not nested and not readingStr:
                 if tempstr != "":
                     result.append(tempstr)
                     tempstr = ""
-            elif nested:
+            elif nested or readingStr:
                 tempstr += ' '
 
-    if tempstr != "":
-        result.append(tempstr)
+        if tempstr != "":
+            result.append(tempstr)
         
-    return result
+        return result

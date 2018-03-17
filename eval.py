@@ -52,6 +52,7 @@ def lispEval(expr, env):
             #TODO:
             # Fix defines inside of another defines
             # Also make it impossible to define keywords
+            # Also make it impossible to define values
             if len(expr) == 3:
                 env.update({expr[1] : lispEval(expr[2], env)})
             else:
@@ -88,7 +89,7 @@ def lispEval(expr, env):
 
         #TODO: elif expr[0] == "lambda":
         # lambdas will need own local environments
-
+        
         elif expr[0] == "cons":
             #TODO:
             # Redo cons because it's 2 am and it probably sucks
