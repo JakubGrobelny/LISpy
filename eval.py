@@ -7,6 +7,7 @@
 
 import types
 from parser import *
+import sys
 
 # evaluates given expression in given environment
 def lispEval(expr, env):
@@ -195,6 +196,24 @@ def interpreter_loop():
 
     exit = False
     globalEnv = globalEnvInit()
+
+    if len(sys.argv):
+        try:
+            for arg in sys.argv[1:]:
+                with open(arg, 'r') as file:
+                    program = file.read()
+                    program = preparse(program)
+                    program = "(" + program + ")"
+                    expressions = parse(program)
+
+                    for expr in expressions:
+                        val = lispEval(expr, globalEnv)
+                        if val:
+                            print(val)
+
+        except:
+            print("Failed to open " + sys.argv[1])
+
     #TODO: load and eval a file before entering interpreter loop
     while not exit:
         userInput = input("> ")
@@ -202,7 +221,7 @@ def interpreter_loop():
             exit = True
         else:
             #print(parse(preparse(userInput)))
-            val = (lispEval(parse(preparse(userInput)), globalEnv))
+            val = lispEval(parse(preparse(userInput)), globalEnv)
             if val != None:
                 print(val)
 
