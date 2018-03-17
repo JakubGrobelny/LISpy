@@ -89,7 +89,7 @@ def lispEval(expr, env):
             elif isFloat(expr):
                 return float(expr)
             else:
-                raise Exception(expr + " is of unknowny type!")
+                raise Exception(expr + " is of unknown type!")
         else:
             return env[expr]
     else:
@@ -103,10 +103,20 @@ def lispEval(expr, env):
                 return env[expr[0]](expr[1:], env)
         else:
             raise Exception('(' + ' '.join(expr) + ')' + " is not a valid expression!")
-        
+
+def globalEnvInit():
+
+    return {"+" : plus,\
+            "-" : minus,\
+            "*" : mult,\
+            "/" : div,\
+            "=" : equal,\
+            ">" : greater}
+
 def interpreter_loop():
+
     exit = False
-    globalEnv = {"+" : plus}
+    globalEnv = globalEnvInit()
     #TODO: load and eval a file before entering interpreter loop
     while not exit:
         userInput = input()
@@ -115,15 +125,76 @@ def interpreter_loop():
         else:
             #print(parse(preparse(userInput)))
             val = (lispEval(parse(preparse(userInput)), globalEnv))
-            if val:
+            if val != None:
                 print(val)
 
 # Basic procedures:
 
 def plus(args, env):
+
     sum = 0
     for arg in args:
         sum += lispEval(arg, env)
     return sum
+
+def minus(args, env):
+
+    if len(args) == 1:
+        return -lispEval(args[0], env)
+    elif len(args) > 0:
+        sum = lispEval(args[0], env)
+    else:
+        raise Exception("-: arity mismatch!")
+
+    for arg in args[1:]:
+        sum -= lispEval(arg, env)
+
+    return sum
+
+def mult(args, env):
+
+    prod = 1
+    for arg in args:
+        prod *= lispEval(arg, env)
+    return prod
+
+def div(args, env):
+
+    if len(args) == 1:
+        return 1 / -lispEval(args[0], env)
+    elif len(args) > 0:
+        quot = lispEval(args[0], env)
+    else:
+        raise Exception("/: arity mismatch!")
+
+    for arg in args[1:]:
+        quot /= lispEval(arg, env)
+
+    return quot
+
+def equal(args, env):
+
+    if not args:
+        raise Exception("=: arity mismatch!")
+    prev = lispEval(args[0], env)
+
+    for arg in args[1:]:
+        if (lispEval(arg, env) != prev):
+            return False
+        prev = lispEval(arg, env)
+
+    return True
+
+def greater(args, env):
+
+    if len(args) < 2:
+        raise Exception(">: arity mismatch!")
+    
+    first = lispEval(args[0], env)
+
+    for arg in args[1:]:
+        if (lispEval(arg, env) >= first):
+            return False
+    return True
 
 interpreter_loop()
