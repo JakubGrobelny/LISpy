@@ -60,9 +60,49 @@ def parse(str):
     return result
 
 # evaluates given expression in given environment
-def eval(expr, env):
+def lispEval(expr, env):
 
-    return 0 #TODO:
+    def isInt(str):
+        try:
+            int(str)
+            return True
+        except:
+            return False
+
+    def isFloat(str):
+        try:
+            float(str)
+            return True
+        except:
+            return False
+
+    if not isinstance(expr, list):
+        if not expr in env:
+            # quotes (and characters)
+            if expr[0] == '\'':
+                return expr
+            # symbols are strings so we return string
+            if expr[0] == expr[-1] == '\"':
+                return expr
+            elif isInt(expr):
+                return int(expr)
+            elif isFloat(expr):
+                return float(expr)
+            else:
+                raise Exception(expr + " is of unknowny type!")
+        else:
+            return env[expr]
+    else:
+        if expr[0] == "define":
+            if len(expr) == 3:
+                env.update({expr[1] : lispEval(expr[2], env)})
+            else:
+                raise Exception("Invalid use of 'define'")
+        #elif isinstance(expr[0], types.FunctionType):
+        #    expr()
+        else:
+            raise Exception("Invalid expression!")
+        
 
 def interpreter_loop():
     exit = False
@@ -73,7 +113,9 @@ def interpreter_loop():
         if userInput == "#exit":
             exit = True
         else:
-            print(parse(preparse(userInput)))
-            #print(eval(parse(preparse(userInput)), globalEnv))
+            #print(parse(preparse(userInput)))
+            val = (lispEval(parse(preparse(userInput)), globalEnv))
+            if val:
+                print(val)
 
 interpreter_loop()
