@@ -95,7 +95,23 @@ def lispEval(expr, env):
             if len(expr) != 3:
                 raise Exception("Invalid use of 'cons'!")
             else:
-                return lispEval(expr[1], env) , lispEval(expr[2], env)
+                return lispEval(expr[1], env), lispEval(expr[2], env)
+
+        elif expr[0] == "car":
+            if len(expr) != 2:
+                raise Exception("Invalid use of 'car'!")
+            elif isinstance(expr[1], tuple):
+                return lispEval(expr[1][0], env)
+            else:
+                raise Exception("Expression is not a pair!")
+
+        elif expr[0] == "cdr":
+            if len(expr) != 2:
+                raise Exception("Invalid use of 'cdr'!")
+            elif isinstance(expr[1], tuple):
+                return lispEval(expr[1][1], env)
+            else:
+                raise Exception("Expression  is not a pair!")
 
         elif expr[0] in env:
             if isinstance(env[expr[0]], types.FunctionType):
@@ -104,7 +120,9 @@ def lispEval(expr, env):
         else:
             raise Exception('(' + ' '.join(expr) + ')' + " is not a valid expression!")
 
-# Basic procedures:
+####################
+# Basic procedures #
+####################
 
 def plus(args, env):
 
@@ -190,8 +208,10 @@ def globalEnvInit():
             ">" : greater,  \
             "modulo" : mod
                             }
+##############
+#    MAIN    #
+##############
 
-# MAIN
 def interpreter_loop():
 
     exit = False
@@ -207,9 +227,12 @@ def interpreter_loop():
                     expressions = parse(program)
 
                     for expr in expressions:
-                        val = lispEval(expr, globalEnv)
-                        if val:
-                            print(val)
+                        try:
+                            val = lispEval(expr, globalEnv)
+                            if val != None:
+                                print(val)
+                        except Exception as exc:
+                            print(exc)
 
         except:
             print("Failed to open " + sys.argv[1])
@@ -220,9 +243,11 @@ def interpreter_loop():
         if userInput == "#exit":
             exit = True
         else:
-            #print(parse(preparse(userInput)))
-            val = lispEval(parse(preparse(userInput)), globalEnv)
-            if val != None:
-                print(val)
+            try:
+                val = lispEval(parse(preparse(userInput)), globalEnv)
+                if val != None:
+                    print(val)
+            except Exception as exc:
+                print(exc)
 
 interpreter_loop()
