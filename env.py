@@ -122,19 +122,42 @@ def list(args, env):
     else:
         return cons([args[0], list(args[1:], env)], env)
 
+def isPair(args, env):
+    if len(args) != 1:
+        raise Exception("pair?: arity mismatch!")
+    else:
+        if type(lispEval(args[0], env)) == pair:
+            return True
+        else:
+            return False
+
+def isList(args, env):
+    if len(args) != 1:
+        raise Exception("list?: arity mismatch!")
+    else:
+        if type(lispEval(args[0], env)) == pair:
+            next = cdr([lispEval(args[0], env)], env)
+            return isList([next], env)
+        else:
+            if lispEval(args[0], env) == "null":
+                return True
+            return False
+
 def globalEnvInit():
 
     # build in definitions
-    return {"+" : plus,     \
-            "-" : minus,    \
-            "*" : mult,     \
-            "/" : div,      \
-            "=" : equal,    \
-            ">" : greater,  \
-            "modulo" : mod, \
-            "exit" : exit,  \
-            "cons" : cons,  \
-            "car" : car,    \
-            "cdr" : cdr,    \
-            "list" : list,
+    return {"+" : plus,     
+            "-" : minus,    
+            "*" : mult,     
+            "/" : div,      
+            "=" : equal,    
+            ">" : greater,  
+            "modulo" : mod, 
+            "exit" : exit,  
+            "cons" : cons,  
+            "car" : car,    
+            "cdr" : cdr,    
+            "list" : list,  
+            "list?" : isList,
+            "pair?" : isPair
                             }

@@ -6,6 +6,7 @@
 import env
 from env import globalEnvInit, lispEval
 from parser import parse, preparse
+from writer import present
 import sys
 
 ##############
@@ -44,7 +45,7 @@ def interpreter_loop():
                         try:
                             val = lispEval(expr, globalEnv)
                             if val != None:
-                                print(val)
+                                present(val)
                         except Exception as exc:
                             print(exc)
 
@@ -57,7 +58,7 @@ def interpreter_loop():
         try:
             val = lispEval(parse(preparse(userInput)), globalEnv)
             if val != None:
-                print(val)
+                present(val)
         except Exception as exc:
             print(exc)
 

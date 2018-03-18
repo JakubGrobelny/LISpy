@@ -13,7 +13,7 @@ from parser import preparse
 #####################
 
 # list of special forms used to check whether an use of 'define' is legal
-specialForms = ["define", "if", "cond", "and", "or", "cons", "car", "cdr"]
+specialForms = ["define", "if", "cond", "and", "or", "lambda"]
 
 # evaluates given expression in given environment
 def lispEval(expr, env):
@@ -47,6 +47,7 @@ def lispEval(expr, env):
     # if the expression is not a list
     if not isinstance(expr, list):
         if not expr in env:
+            # basic types
             if type(expr) in basic:
                 return expr
             # boolean types
@@ -62,10 +63,10 @@ def lispEval(expr, env):
             # symbols are strings so we return string
             if expr[0] == expr[-1] == '\"':
                 return expr
-            # int
+            # int (but still represented by string)
             elif isInt(expr):
                 return int(expr)
-            # float
+            # float (same as above)
             elif isFloat(expr):
                 return float(expr)
             else:
