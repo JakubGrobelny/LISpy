@@ -4,10 +4,12 @@
 
 from env import car, cdr
 from pair import pair
+import types
 
 # function that prints values in certain formats
 def present(value):
     
+    #TODO: print lists recursively
     if type(value) == pair:
         ls = [value.get(0)]
         while type(value) == pair:
@@ -17,6 +19,7 @@ def present(value):
         if value != "null":
             ls.append(value)
         print("'(" + ' '.join(map(str, ls)) + ")")
+    elif isinstance(value, types.FunctionType):
+        print("#<procedure:" + value.__name__ + ">")
     else:
         print(value)    
-    
