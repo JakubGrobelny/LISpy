@@ -86,7 +86,13 @@ def lispEval(expr, env):
                 elif expr[1] in specialForms:
                     raise Exception("Can not define a keyword!")
                 else:
-                    env.update({expr[1] : lispEval(expr[2], env)})
+                    # Syntactic sugar for lambda definitions
+                    if isinstance(expr[1], list):
+                        name = expr[1][0]
+                        parameters = expr[1][1:]
+                        env.update({name : lispEval(["lambda", parameters, expr[2]], env)})
+                    else:
+                        env.update({expr[1] : lispEval(expr[2], env)})
             else:
                 raise Exception("Invalid use of 'define'!")
 
@@ -127,6 +133,7 @@ def lispEval(expr, env):
                     newEnv = {}
                     for symbol in expr[1]:
                         newEnv.update({symbol : "null"})
+
                     def proc(args, env):
 
                         locEnv = env
