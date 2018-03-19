@@ -116,6 +116,7 @@ def cdr(args, env):
     else:
         return lispEval(p.get(1), env)
 
+#TODO: change name
 def list(args, env):
     if len(args) == 0:
         return "null"
@@ -159,5 +160,6 @@ def globalEnvInit():
             "cdr" : cdr,    
             "list" : list,  
             "list?" : isList,
-            "pair?" : isPair
+            "pair?" : isPair,
+            "eval" : lispEval#TODO: fix
                             }

@@ -42,7 +42,7 @@ def lispEval(expr, env):
         except:
             return False
 
-    basic = {int, float, pair}
+    basic = [int, float, pair]
 
     # if the expression is not a list
     if not isinstance(expr, list):
@@ -119,8 +119,28 @@ def lispEval(expr, env):
                     return True
             return False
 
-        #TODO: elif expr[0] == "lambda":
-        # lambdas will need own local environments
+        elif expr[0] == "lambda":
+            if len(expr) == 3:
+                if not isinstance(expr[1], list):
+                    raise ("Invalid use of 'lambda!")
+                else:
+                    newEnv = {}
+                    for symbol in expr[1]:
+                        newEnv.update({symbol : "null"})
+                    def proc(args, env):
+
+                        locEnv = env
+
+                        if len(newEnv.keys()) != len(args):
+                            raise Exception("Arity mismatch!")
+
+                        for key, arg in zip(newEnv.keys(), args):
+                            locEnv[key] = lispEval(arg, env)
+
+                        return lispEval(expr[2], locEnv)
+                    return proc 
+            else:
+                raise Exception("Invalid use of 'lambda'!")
 
         # calculating operator
         elif type(expr[0]) == list:
