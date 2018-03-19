@@ -8,6 +8,8 @@ from env import globalEnvInit, lispEval
 from parser import parse, preparse
 from writer import present
 import sys
+#import resource
+#import threading
 
 ##############
 #    MAIN    #
@@ -17,6 +19,9 @@ def interpreter_loop():
 
     # dictionary used to represent global environment
     globalEnv = globalEnvInit()
+    sys.setrecursionlimit(10000)
+    #resource.setrlimit(resource.RLIMIT_STACK, (resource.RLIM_INFINITY, resource.RLIM_INFINITY))
+    #threading.stack_size(10**9)
 
     # loading parts of the language written in the language itself (a.k.a. standard library)
     try:

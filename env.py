@@ -150,6 +150,11 @@ def rand(args, env):
         raise Exception("random: arity mismatch!")
     return randint(lispEval(args[0], env), lispEval(args[1], env))
 
+def expt(args, env):
+    if len(args) != 2:
+        raise Exception("exp: arity mismatch!")
+    return lispEval(args[0], env)**lispEval(args[1], env)
+
 def globalEnvInit():
 
     # build in definitions
@@ -168,5 +173,6 @@ def globalEnvInit():
             "list?" : isList,
             "pair?" : isPair,
             "random" : rand,
+            "expt" : expt,
             "eval" : lispEval#TODO: fix
                             }
