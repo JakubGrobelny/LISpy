@@ -5,6 +5,7 @@
 import sys
 from leval import lispEval
 from pair import pair
+from random import randint
 
 # global variable used to determine whether the program should close
 end = False
@@ -144,6 +145,11 @@ def isList(args, env):
                 return True
             return False
 
+def rand(args, env):
+    if len(args) != 2:
+        raise Exception("random: arity mismatch!")
+    return randint(lispEval(args[0], env), lispEval(args[1], env))
+
 def globalEnvInit():
 
     # build in definitions
@@ -161,5 +167,6 @@ def globalEnvInit():
             "list" : list,  
             "list?" : isList,
             "pair?" : isPair,
+            "random" : rand,
             "eval" : lispEval#TODO: fix
                             }
