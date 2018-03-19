@@ -45,6 +45,7 @@ def parse(str):
         #TODO:
         # 1. do quotations
         # 2. use any type of brackets
+        # 3. add inline python for fun
 
         for c in str:
 

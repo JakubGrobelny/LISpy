@@ -80,6 +80,7 @@ def lispEval(expr, env):
         if expr[0] == "define":
             #TODO:
             # Fix defines inside of another defines
+            # Fix defines inside of lambdas
             if len(expr) == 3:
                 if isFloat(expr[1]) or isInt(expr[1]) or isString(expr[1]):
                     raise Exception("Can not define a value!")

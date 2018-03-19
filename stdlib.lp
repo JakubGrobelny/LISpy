@@ -87,3 +87,11 @@
 
 (define (third ls)
     (caddr ls))
+
+(define (length ls)
+    (if (null? ls)
+        0
+        (1+ (length (cdr ls)))))
+
+(define (div a b)
+    (/ (- a (mod a b)) b))
