@@ -92,6 +92,7 @@ def mod(args, env):
 def exit(args, env):
     global end
     end = True
+    return "__!@not_a_value@!__"
 
 def cons(args, env):
     if len(args) != 2:
@@ -120,7 +121,7 @@ def cdr(args, env):
 #TODO: change name
 def list(args, env):
     if len(args) == 0:
-        return "null"
+        return None
     else:
         return cons([args[0], list(args[1:], env)], env)
 
@@ -141,7 +142,7 @@ def isList(args, env):
             next = cdr([lispEval(args[0], env)], env)
             return isList([next], env)
         else:
-            if lispEval(args[0], env) == "null":
+            if lispEval(args[0], env) == None:
                 return True
             return False
 
@@ -155,6 +156,14 @@ def expt(args, env):
         raise Exception("exp: arity mismatch!")
     return lispEval(args[0], env)**lispEval(args[1], env)
 
+def resetEnv(args, env):
+    if len(args):
+        raise Exception("reset-env: arity mismatch!")
+    else:
+        env.clear()
+        env.update(globalEnvInit())
+    return "__!@not_a_value@!__"
+
 def globalEnvInit():
 
     # build in definitions
@@ -165,7 +174,6 @@ def globalEnvInit():
             "=" : equal,    
             ">" : greater,  
             "modulo" : mod, 
-            "exit" : exit,  
             "cons" : cons,  
             "car" : car,    
             "cdr" : cdr,    
@@ -174,5 +182,7 @@ def globalEnvInit():
             "pair?" : isPair,
             "random" : rand,
             "expt" : expt,
+            "!exit" : exit,  
+            "!reset-env" : resetEnv,
             "eval" : lispEval#TODO: fix
                             }

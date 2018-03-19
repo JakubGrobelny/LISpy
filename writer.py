@@ -16,10 +16,10 @@ def present(value):
             value = value.get(1)
             if type(value) == pair:
                 ls.append(value.get(0))
-        if value != "null":
+        if value != None:
             ls.append(value)
         print("'(" + ' '.join(map(str, ls)) + ")")
     elif isinstance(value, types.FunctionType):
         print("#<procedure:" + value.__name__ + ">")
-    else:
+    elif value != "__!@not_a_value@!__":
         print(value)    

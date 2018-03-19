@@ -8,7 +8,6 @@
 ;; Macros
 (define mod modulo)
 (define % modulo)
-(define quit exit)
 
 ;; Procedures
 

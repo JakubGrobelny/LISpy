@@ -13,7 +13,8 @@ from parser import preparse
 #####################
 
 # list of special forms used to check whether an use of 'define' is legal
-specialForms = ["define", "if", "cond", "and", "or", "lambda"]
+specialForms = ["define", "if", "cond", "and", "or", "lambda", "let"]
+basic = [int, float, pair, bool]
 
 # evaluates given expression in given environment
 def lispEval(expr, env):
@@ -42,27 +43,22 @@ def lispEval(expr, env):
         except:
             return False
 
-    basic = [int, float, pair]
-
     # if the expression is not a list
     if not isinstance(expr, list):
         if not expr in env:
             # basic types
             if type(expr) in basic:
                 return expr
+            if expr in specialForms:
+                raise Exception("Invalid use of '" + expr + "'!")
             # boolean types
-            if expr == "false" or expr == "#f":
+            if expr == "false" or expr == "False":
                 return False
-            if expr == "true" or expr == "#t":
+            if expr == "true" or expr == "True":
                 return True
-            if expr == "null":
-                return "null"
-            # quotes (and characters)
-            if expr[0] == '\'':
-                return expr
-            # symbols are strings so we return string
-            if expr[0] == expr[-1] == '\"':
-                return expr
+            # no value is "__!@not_a_value@!__"
+            if expr == "null" or expr == "None" or expr == None:
+                return None
             # int (but still represented by string)
             elif isInt(expr):
                 return int(expr)
@@ -70,12 +66,12 @@ def lispEval(expr, env):
             elif isFloat(expr):
                 return float(expr)
             else:
-                raise Exception(expr + " is of unknown type!")
+                raise Exception(expr + " is undefined!")
         else:
             return env[expr]
+
     # else if the expression is a list
     else:
-
         # checking for special forms first
         if expr[0] == "define":
             #TODO:
@@ -94,6 +90,7 @@ def lispEval(expr, env):
                         env.update({name : lispEval(["lambda", parameters, expr[2]], env)})
                     else:
                         env.update({expr[1] : lispEval(expr[2], env)})
+                    return "__!@not_a_value@!__"
             else:
                 raise Exception("Invalid use of 'define'!")
 
@@ -133,23 +130,37 @@ def lispEval(expr, env):
                 else:
                     newEnv = {}
                     for symbol in expr[1]:
-                        newEnv.update({symbol : "null"})
+                        newEnv.update({symbol : None})
 
                     def proc(args, env):
-
                         arity = len(newEnv)
                         locEnv = env
-
                         if arity != len(args):
                             raise Exception("Arity mismatch! Expected " + str(arity) + " got " + str(len(args)))
-
                         for key, arg in zip(newEnv.keys(), args):
                             locEnv[key] = lispEval(arg, env)
-
                         return lispEval(expr[2], locEnv)
+
                     return proc 
             else:
                 raise Exception("Invalid use of 'lambda'!")
+
+        elif expr[0] == "let":
+            if len(expr) != 3:
+                raise Exception("Invalid use of 'let'!")
+            else:
+                body = expr[2]
+                argVals = []
+                args = []
+                
+                for definition in expr[1]:
+                    if not isinstance(definition, list):
+                        raise Exception("Invalid use of 'let'!")
+                    else:
+                        args.append(definition[0])
+                        argVals.append(lispEval(definition[1], env))
+
+                return lispEval(["lambda", args, body], env)(argVals, env)
 
         # calculating operator
         elif type(expr[0]) == list:

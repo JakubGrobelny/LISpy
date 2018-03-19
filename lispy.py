@@ -62,8 +62,7 @@ def interpreter_loop():
         userInput = input("> ")
         try:
             val = lispEval(parse(preparse(userInput)), globalEnv)
-            if val != None:
-                present(val)
+            present(val)
         except Exception as exc:
             print(exc)
 
