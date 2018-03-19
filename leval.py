@@ -136,10 +136,11 @@ def lispEval(expr, env):
 
                     def proc(args, env):
 
+                        arity = len(newEnv)
                         locEnv = env
 
-                        if len(newEnv.keys()) != len(args):
-                            raise Exception("Arity mismatch!")
+                        if arity != len(args):
+                            raise Exception("Arity mismatch! Expected " + str(arity) + " got " + str(len(args)))
 
                         for key, arg in zip(newEnv.keys(), args):
                             locEnv[key] = lispEval(arg, env)

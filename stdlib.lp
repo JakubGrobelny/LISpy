@@ -12,58 +12,78 @@
 
 ;; Procedures
 
-(define null? (lambda (x)
-                    (= x null)))
+(define (null? x)
+    (= x null))
 
-(define 1+ (lambda (x)
-                    (+ x 1)))
+(define (1+ x)
+    (+ x 1))
 
-(define 1- (lambda (x)
-                    (+ x 1)))
+(define (1- x)
+    (+ x 1))
 
-(define cadr (lambda (p)
-                    (car (cdr p))))
+(define (cadr p)
+    (car (cdr p)))
 
-(define cdar (lambda (p)
-                    (cdr (car p))))
+(define (cdar p)
+    (cdr (car p)))
 
-(define caar (lambda (p)
-                    (car (car p))))
+(define (caar p)
+    (car (car p)))
 
-(define cddr (lambda (p)
-                    (cdr (cdr p))))
+(define (cddr p)
+    (cdr (cdr p)))
 
-(define append (lambda (xs ys)
-                    (if (null? xs)
-                        ys
-                        (cons (car xs) (append (cdr xs) ys)))))
+(define (cddar p)
+    (cdr (cdr (car p))))
 
-(define map (lambda (proc xs)
-                    (if (null? xs)
-                        null
-                        (cons (proc (car xs)) (map proc (cdr xs))))))
+(define (caddr p)
+    (car (cdr (cdr p))))
 
-(define not (lambda (p)
-		    (if p false true)))
+(define (append xs ys)
+    (if (null? xs)
+        ys
+        (cons
+            (car xs)
+            (append (cdr xs) ys))))
 
-(define >= (lambda (a b)
-		    (if (< a b)
-			false
-			true)))
+(define (map proc xs)
+    (if (null? xs)
+        null
+        (cons 
+            (proc (car xs)) 
+            (map proc (cdr xs)))))
 
-(define < (lambda (a b)
-		(and (not (> a b))
-		     (not (= a b)))))
+(define (not p)
+    (if p
+        false
+        true))
 
-(define <= (lambda (a b)
-		    (or (< a b)
-			(= a b))))
+(define (>= a b)
+    (not (< a b)))
 
-(define xor (lambda (p1 p2)
-		    (and (or p1 p2)
-			 (not (and p1 p2)))))
+(define (< a b) 
+    (and 
+        (not (> a b)) 
+        (not (= a b))))
 
-(define range (lambda (start end)
-		    (if (> start end)
-			null
-			(cons start (range (1+ start) end)))))
+(define (<= a b)
+    (or (< a b)
+        (= a b)))
+
+(define (xor p1 p2)
+    (and (or p1 p2)
+         (not (and p1 p2))))
+
+(define (range start end)
+    (if (> start end)
+        null
+        (cons start (range (1+ start) end))))
+
+(define (first ls)
+    (car ls))
+
+(define (second ls)
+    (cadr ls))
+
+(define (third ls)
+    (caddr ls))
