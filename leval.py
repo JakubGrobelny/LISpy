@@ -13,7 +13,7 @@ from parser import preparse
 #####################
 
 # list of special forms used to check whether an use of 'define' is legal
-specialForms = ["define", "if", "cond", "and", "or", "lambda", "let"]
+specialForms = ["define", "if", "cond", "and", "or", "lambda", "let*", "let"]
 basic = [int, float, pair, bool]
 
 # evaluates given expression in given environment
@@ -134,7 +134,7 @@ def lispEval(expr, env):
 
                     def proc(args, env):
                         arity = len(newEnv)
-                        locEnv = env
+                        locEnv = dict(env)
                         if arity != len(args):
                             raise Exception("Arity mismatch! Expected " + str(arity) + " got " + str(len(args)))
                         for key, arg in zip(newEnv.keys(), args):
@@ -144,7 +144,7 @@ def lispEval(expr, env):
                     return proc 
             else:
                 raise Exception("Invalid use of 'lambda'!")
-
+        
         elif expr[0] == "let":
             if len(expr) != 3:
                 raise Exception("Invalid use of 'let'!")
@@ -152,19 +152,48 @@ def lispEval(expr, env):
                 body = expr[2]
                 argVals = []
                 args = []
-                
+
                 for definition in expr[1]:
                     if not isinstance(definition, list):
                         raise Exception("Invalid use of 'let'!")
                     else:
                         args.append(definition[0])
-                        argVals.append(lispEval(definition[1], env))
+                        argVals.append(definition[1])
+                        
+                        try:
+                            lispEval(argVals[-1], env)
+                        except:
+                            raise Exception("'let' is not recursive! Did you mean 'let*'?")
 
-                return lispEval(["lambda", args, body], env)(argVals, env)
+                lamb = lispEval(["lambda", args, body], env)
+                return lamb(argVals, env)
+
+        elif expr[0] == "let*":
+            if len(expr) != 3:
+                raise Exception("Invalid use of 'let*'!")
+            else:
+                body = expr[2]
+                argVals = []
+                args = []
+
+                smallEnv = dict(env)
+
+                for definition in expr[1]:
+                    if not isinstance(definition, list):
+                        raise Exception("Invalid use of 'let*'!")
+                    else:
+                        args.append(definition[0])
+                        argVals.append(definition[1])
+                        try:
+                            smallEnv.update({args[-1] : lispEval(argVals[-1], smallEnv)})
+                        except:
+                            raise Exception("Recursive 'let' failed!")
+                
+                lamb = lispEval(["lambda", args, body], smallEnv)
+                return lamb(argVals, smallEnv)
 
         # calculating operator
         elif type(expr[0]) == list:
-
             op = lispEval(expr[0], env)
 
             try:

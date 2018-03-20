@@ -1,6 +1,14 @@
-((lambda (x y)
-  (+ x y)) 20 10)
+; should be 42
+(let ((a 20)
+      (b 22))
+    (+ a b))
 
-(let ((x 20)
-      (y 10))
-    (+ x y))
+; should fail
+(let ((a 60)
+      (b (* (/ a 20) 3)))
+    (+ a b))
+
+; should be 69
+(let* ((a 60)
+      (b (* (/ a 20) 3)))
+    (+ a b))
