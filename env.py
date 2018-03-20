@@ -3,7 +3,7 @@
 # 2018
 
 import sys
-from leval import lispEval
+from leval import lispEval, notValue
 from pair import pair
 from random import randint
 
@@ -92,7 +92,7 @@ def mod(args, env):
 def exit(args, env):
     global end
     end = True
-    return "__!@not_a_value@!__"
+    return notValue
 
 def cons(args, env):
     if len(args) != 2:
@@ -158,11 +158,11 @@ def expt(args, env):
 
 def resetEnv(args, env):
     if len(args):
-        raise Exception("reset-env: arity mismatch!")
+        raise Exception("!reset-env: arity mismatch!")
     else:
         env.clear()
         env.update(globalEnvInit())
-    return "__!@not_a_value@!__"
+    return notValue
 
 def globalEnvInit():
 
@@ -182,7 +182,10 @@ def globalEnvInit():
             "pair?" : isPair,
             "random" : rand,
             "expt" : expt,
+            # procedures with '!' as prefix shouldn't really be used
+            # (except !exit)
             "!exit" : exit,  
             "!reset-env" : resetEnv,
+            # eval
             "eval" : lispEval#TODO: fix
                             }

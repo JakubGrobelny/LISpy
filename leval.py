@@ -13,7 +13,9 @@ from parser import preparse
 #####################
 
 # list of special forms used to check whether an use of 'define' is legal
-specialForms = ["define", "if", "cond", "and", "or", "lambda", "let*", "let"]
+notValue = "__!@not_a_value@!__"
+specialForms = ["define", "if", "cond", "and", "or", "lambda", "let*", "let", "quote"]
+specialValues = ["None", "False", "True"]
 basic = [int, float, pair, bool]
 
 # evaluates given expression in given environment
@@ -78,7 +80,7 @@ def lispEval(expr, env):
             # Fix defines inside of another defines
             # Fix defines inside of lambdas
             if len(expr) == 3:
-                if isFloat(expr[1]) or isInt(expr[1]) or isString(expr[1]):
+                if isFloat(expr[1]) or isInt(expr[1]) or isString(expr[1]) or expr[1] in specialValues:
                     raise Exception("Can not define a value!")
                 elif expr[1] in specialForms:
                     raise Exception("Can not define a keyword!")
@@ -90,7 +92,7 @@ def lispEval(expr, env):
                         env.update({name : lispEval(["lambda", parameters, expr[2]], env)})
                     else:
                         env.update({expr[1] : lispEval(expr[2], env)})
-                    return "__!@not_a_value@!__"
+                    return notValue
             else:
                 raise Exception("Invalid use of 'define'!")
 
@@ -199,6 +201,12 @@ def lispEval(expr, env):
                 
                 lamb = lispEval(["lambda", args, body], smallEnv)
                 return lamb(argVals, smallEnv)
+
+        elif expr[0] == "quote":
+            if len(expr) != 2:
+                raise Exception("Invalid use of 'quote'")
+            else:
+                return expr[1]
 
         # calculating operator
         elif type(expr[0]) == list:

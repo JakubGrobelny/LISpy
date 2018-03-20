@@ -4,7 +4,7 @@
 # probably
 
 import env
-from env import globalEnvInit, lispEval
+from env import globalEnvInit, lispEval, notValue
 from parser import parse, preparse
 from writer import present
 import sys
