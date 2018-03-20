@@ -12,3 +12,8 @@
 (let* ((a 60)
       (b (* (/ a 20) 3)))
     (+ a b))
+
+; should be 420 (accidentaly)
+(let* ((a (+ 1 b))
+       (b 20))
+    (* a b))

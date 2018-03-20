@@ -168,6 +168,7 @@ def lispEval(expr, env):
                 lamb = lispEval(["lambda", args, body], env)
                 return lamb(argVals, env)
 
+        # recursive let
         elif expr[0] == "let*":
             if len(expr) != 3:
                 raise Exception("Invalid use of 'let*'!")
@@ -185,9 +186,16 @@ def lispEval(expr, env):
                         args.append(definition[0])
                         argVals.append(definition[1])
                         try:
-                            smallEnv.update({args[-1] : lispEval(argVals[-1], smallEnv)})
+                            value = lispEval(argVals[-1], smallEnv)
+                            smallEnv.update({args[-1] : value})
                         except:
-                            raise Exception("Recursive 'let' failed!")
+                            smallEnv.update({args[-1] : None})
+
+                for key, val in zip(args, argVals):
+                    try:
+                        smallEnv.update({key : lispEval(val, smallEnv)})
+                    except:
+                        raise Exception("Recursive 'let' failed!")
                 
                 lamb = lispEval(["lambda", args, body], smallEnv)
                 return lamb(argVals, smallEnv)
