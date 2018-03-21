@@ -137,12 +137,14 @@ def lispEval(expr, env):
                         newEnv.update({symbol : None})
 
                     arity = len(newEnv)
+
                     body = expr[2][-1]
                     
                     for definition in expr[2][0:-1]:
                         if definition:
-                            print(definition)
                             lispEval(definition[0], newEnv)
+
+                    #print(newEnv)
 
                     def proc(args, env):
                         locEnv = dict(env)
