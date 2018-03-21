@@ -179,10 +179,11 @@ def lispEval(expr, env):
                         except:
                             raise Exception("'let' is not recursive! Did you mean 'let*'?")
 
-                lamb = lispEval(["lambda", args, body], env)
+                lamb = lispEval(["lambda", args, [body]], env)
                 return lamb(argVals, env)
 
         # recursive let
+        #TODO: fix it to make it actually evaluate everything pararelly
         elif expr[0] == "let*":
             if len(expr) != 3:
                 raise Exception("Invalid use of 'let*'!")
@@ -211,7 +212,7 @@ def lispEval(expr, env):
                     except:
                         raise Exception("Recursive 'let' failed!")
                 
-                lamb = lispEval(["lambda", args, body], smallEnv)
+                lamb = lispEval(["lambda", args, [body]], smallEnv)
                 return lamb(argVals, smallEnv)
 
         elif expr[0] == "quote":
