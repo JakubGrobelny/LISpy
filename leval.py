@@ -79,22 +79,24 @@ def lispEval(expr, env):
             #TODO:
             # Fix defines inside of another defines
             # Fix defines inside of lambdas
-            if len(expr) == 3:
-                if isFloat(expr[1]) or isInt(expr[1]) or isString(expr[1]) or expr[1] in specialValues:
-                    raise Exception("Can not define a value!")
-                elif expr[1] in specialForms:
-                    raise Exception("Can not define a keyword!")
-                else:
-                    # Syntactic sugar for lambda definitions
-                    if isinstance(expr[1], list):
-                        name = expr[1][0]
-                        parameters = expr[1][1:]
-                        env.update({name : lispEval(["lambda", parameters, expr[2]], env)})
-                    else:
-                        env.update({expr[1] : lispEval(expr[2], env)})
-                    return notValue
+            #if len(expr) == 3:
+            if isFloat(expr[1]) or isInt(expr[1]) or isString(expr[1]) or expr[1] in specialValues:
+                raise Exception("Can not define a value!")
+            elif expr[1] in specialForms:
+                raise Exception("Can not define a keyword!")
             else:
-                raise Exception("Invalid use of 'define'!")
+                # Syntactic sugar for lambda definitions
+                if isinstance(expr[1], list):
+                    name = expr[1][0]
+                    parameters = expr[1][1:]
+                    definitions = expr[2:-1]
+                    body = expr[-1]
+                    env.update({name : lispEval(["lambda", parameters, [definitions, body]], env)})
+                else:
+                    env.update({expr[1] : lispEval(expr[2], env)})
+                return notValue
+            #else:
+            #    raise Exception("Invalid use of 'define'!")
 
         elif expr[0] == "if":
             if len(expr) != 4:
@@ -134,14 +136,22 @@ def lispEval(expr, env):
                     for symbol in expr[1]:
                         newEnv.update({symbol : None})
 
+                    arity = len(newEnv)
+                    body = expr[2][-1]
+                    
+                    for definition in expr[2][0:-1]:
+                        if definition:
+                            print(definition)
+                            lispEval(definition[0], newEnv)
+
                     def proc(args, env):
-                        arity = len(newEnv)
                         locEnv = dict(env)
                         if arity != len(args):
                             raise Exception("Arity mismatch! Expected " + str(arity) + " got " + str(len(args)))
                         for key, arg in zip(newEnv.keys(), args):
                             locEnv[key] = lispEval(arg, env)
-                        return lispEval(expr[2], locEnv)
+
+                        return lispEval(body, locEnv)
 
                     return proc 
             else:
