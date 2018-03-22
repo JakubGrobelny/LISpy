@@ -14,7 +14,7 @@ from parser import preparse
 
 # list of special forms used to check whether an use of 'define' is legal
 notValue = "__!@not_a_value@!__"
-specialForms = ["define", "if", "cond", "and", "or", "lambda", "let*", "let", "quote"]
+specialForms = ["define", "if", "cond", "and", "or", "lambda", "let*", "let", "quote", "λ"]
 specialValues = ["None", "False", "True"]
 basic = [int, float, pair, bool]
 
@@ -89,7 +89,7 @@ def lispEval(expr, env):
                 if isinstance(expr[1], list):
                     name = expr[1][0]
                     parameters = expr[1][1:]
-                    env.update({name : lispEval(["lambda", parameters, expr[2]], env)})
+                    env.update({name : lispEval(["lambda", parameters, expr[2:]], env)})
                 else:
                     env.update({expr[1] : lispEval(expr[2], env)})
                 return notValue
@@ -125,30 +125,34 @@ def lispEval(expr, env):
                     return True
             return False
 
-        elif expr[0] == "lambda":
-            if len(expr) == 3:
-                if not isinstance(expr[1], list):
-                    raise ("Invalid use of 'lambda!")
-                else:
-                    newEnv = {}
-                    for symbol in expr[1]:
-                        newEnv.update({symbol : None})
-
-                    arity = len(newEnv)
-                    body = expr[2]
-
-                    def proc(args, env):
-                        locEnv = dict(env)
-                        if arity != len(args):
-                            raise Exception("Arity mismatch! Expected " + str(arity) + " got " + str(len(args)))
-                        for key, arg in zip(newEnv.keys(), args):
-                            locEnv[key] = lispEval(arg, env)
-
-                        return lispEval(body, locEnv)
-
-                    return proc 
+        elif expr[0] == "lambda" or expr[0] == "λ":
+            #if len(expr) == 3:
+            if not isinstance(expr[1], list):
+                raise ("Invalid use of 'lambda!")
             else:
-                raise Exception("Invalid use of 'lambda'!")
+                
+                newEnv = {}
+                for symbol in expr[1]:
+                    newEnv.update({symbol : None})
+
+                arity = len(newEnv)
+                body = expr[2][-1]
+
+                definitions = expr[2][:-1]
+
+                def proc(args, env):
+                    locEnv = dict(env)
+                    if arity != len(args):
+                        raise Exception("Arity mismatch! Expected " + str(arity) + " got " + str(len(args)))
+                    for key, arg in zip(newEnv.keys(), args):
+                        locEnv[key] = lispEval(arg, env)
+
+                    for definition in definitions:
+                        lispEval(definition, locEnv)
+
+                    return lispEval(body, locEnv)
+
+                return proc 
         
         elif expr[0] == "let":
             if len(expr) != 3:
