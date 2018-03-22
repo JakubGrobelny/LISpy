@@ -59,7 +59,7 @@ def interpreter_loop():
 
     # read-eval-print loop
     while not env.end:
-        userInput = input("> ")
+        userInput = input(">>> ")
         try:
             val = lispEval(parse(preparse(userInput)), globalEnv)
             present(val)

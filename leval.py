@@ -14,7 +14,8 @@ from parser import preparse
 
 # list of special forms used to check whether an use of 'define' is legal
 notValue = "__!@not_a_value@!__"
-specialForms = ["define", "if", "cond", "and", "or", "lambda", "let*", "let", "quote", "λ"]
+funcDefinitionsFlag = "__!@contains_definitions@!__"
+specialForms = ["define", "if", "cond", "and", "or", "lambda", "let", "quote", "λ"]
 specialValues = ["None", "False", "True"]
 basic = [int, float, pair, bool]
 
@@ -89,12 +90,86 @@ def lispEval(expr, env):
                 if isinstance(expr[1], list):
                     name = expr[1][0]
                     parameters = expr[1][1:]
-                    env.update({name : lispEval(["lambda", parameters, expr[2:]], env)})
+                    body = expr[2:]
+                    body.append({"tag" : None})
+                    env.update({name : lispEval(["lambda", parameters, body], env)})
                 else:
                     env.update({expr[1] : lispEval(expr[2], env)})
                 return notValue
             #else:
             #    raise Exception("Invalid use of 'define'!")
+
+        elif expr[0] == "lambda" or expr[0] == "λ":
+            #if len(expr) == 3:
+            if not isinstance(expr[1], list):
+                raise ("Invalid use of 'lambda'!")
+            else:
+                
+                # compressing definitions and stuff into one list to
+                # match the way it was done in 'define'
+
+                if len(expr) > 3:
+                    exprList = []
+                    for expression in expr[2:]:
+                        exprList.append(expression)
+                else:
+                    exprList = [expr[2]]
+                    if isinstance(expr[2], list):    
+                        if isinstance(expr[2][-1], dict):
+                            exprList = expr[2][:-1]
+
+                body = exprList[-1]
+                definitions = exprList[:-1]
+
+                newEnv = {}
+                for symbol in expr[1]:
+                    newEnv.update({symbol : None})
+
+                arity = len(newEnv)                
+
+                def proc(args, env):
+                    locEnv = dict(env)
+                    if arity != len(args):
+                        raise Exception("Arity mismatch! Expected " + str(arity) + " got " + str(len(args)))
+                    for key, arg in zip(newEnv.keys(), args):
+                        locEnv[key] = lispEval(arg, env)
+
+                    for definition in definitions:
+                        lispEval(definition, locEnv)
+
+                    return lispEval(body, locEnv)
+
+                return proc 
+        
+        elif expr[0] == "let":
+            if len(expr) != 3:
+                raise Exception("Invalid use of 'let'!")
+            else:
+                body = expr[2]
+
+                argVals = []
+                args = []
+
+                for definition in expr[1]:
+                    if not isinstance(definition, list):
+                        raise Exception("Invalid use of 'let'!")
+                    else:
+                        args.append(definition[0])
+                        argVals.append(definition[1])
+                        
+                        try:
+                            lispEval(argVals[-1], env)
+                        except:
+                            raise Exception("Unbound identifier in 'let'!")
+
+                lamb = lispEval(["lambda", args, body], env)
+                return lamb(argVals, env)
+
+        elif expr[0] == "quote":
+            if len(expr) != 2:
+                raise Exception("Invalid use of 'quote'")
+            else:
+                return expr[1]
 
         elif expr[0] == "if":
             if len(expr) != 4:
@@ -124,97 +199,6 @@ def lispEval(expr, env):
                 if lispEval(pred, env):
                     return True
             return False
-
-        elif expr[0] == "lambda" or expr[0] == "λ":
-            #if len(expr) == 3:
-            if not isinstance(expr[1], list):
-                raise ("Invalid use of 'lambda!")
-            else:
-                
-                newEnv = {}
-                for symbol in expr[1]:
-                    newEnv.update({symbol : None})
-
-                arity = len(newEnv)
-                body = expr[2][-1]
-
-                definitions = expr[2][:-1]
-
-                def proc(args, env):
-                    locEnv = dict(env)
-                    if arity != len(args):
-                        raise Exception("Arity mismatch! Expected " + str(arity) + " got " + str(len(args)))
-                    for key, arg in zip(newEnv.keys(), args):
-                        locEnv[key] = lispEval(arg, env)
-
-                    for definition in definitions:
-                        lispEval(definition, locEnv)
-
-                    return lispEval(body, locEnv)
-
-                return proc 
-        
-        elif expr[0] == "let":
-            if len(expr) != 3:
-                raise Exception("Invalid use of 'let'!")
-            else:
-                body = expr[2]
-                argVals = []
-                args = []
-
-                for definition in expr[1]:
-                    if not isinstance(definition, list):
-                        raise Exception("Invalid use of 'let'!")
-                    else:
-                        args.append(definition[0])
-                        argVals.append(definition[1])
-                        
-                        try:
-                            lispEval(argVals[-1], env)
-                        except:
-                            raise Exception("'let' is not recursive! Did you mean 'let*'?")
-
-                lamb = lispEval(["lambda", args, body], env)
-                return lamb(argVals, env)
-
-        # recursive let
-        #TODO: fix it to make it actually evaluate everything pararelly
-        elif expr[0] == "let*":
-            if len(expr) != 3:
-                raise Exception("Invalid use of 'let*'!")
-            else:
-                body = expr[2]
-                argVals = []
-                args = []
-
-                smallEnv = dict(env)
-
-                for definition in expr[1]:
-                    if not isinstance(definition, list):
-                        raise Exception("Invalid use of 'let*'!")
-                    else:
-                        args.append(definition[0])
-                        argVals.append(definition[1])
-                        try:
-                            value = lispEval(argVals[-1], smallEnv)
-                            smallEnv.update({args[-1] : value})
-                        except:
-                            smallEnv.update({args[-1] : None})
-
-                for key, val in zip(args, argVals):
-                    try:
-                        smallEnv.update({key : lispEval(val, smallEnv)})
-                    except:
-                        raise Exception("Recursive 'let' failed!")
-                
-                lamb = lispEval(["lambda", args, body], smallEnv)
-                return lamb(argVals, smallEnv)
-
-        elif expr[0] == "quote":
-            if len(expr) != 2:
-                raise Exception("Invalid use of 'quote'")
-            else:
-                return expr[1]
 
         # calculating operator
         elif type(expr[0]) == list:

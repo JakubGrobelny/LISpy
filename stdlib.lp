@@ -88,9 +88,11 @@
     (caddr ls))
 
 (define (length ls)
-    (if (null? ls)
-        0
-        (1+ (length (cdr ls)))))
+    (define (aux acc ls)
+        (if (null? ls)
+            acc
+            (aux (1+ acc) (cdr ls))))
+    (aux 0 ls))
 
 (define (div a b)
     (/ (- a (mod a b)) b))
