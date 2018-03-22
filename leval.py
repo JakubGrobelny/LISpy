@@ -89,9 +89,7 @@ def lispEval(expr, env):
                 if isinstance(expr[1], list):
                     name = expr[1][0]
                     parameters = expr[1][1:]
-                    definitions = expr[2:-1]
-                    body = expr[-1]
-                    env.update({name : lispEval(["lambda", parameters, [definitions, body]], env)})
+                    env.update({name : lispEval(["lambda", parameters, expr[2]], env)})
                 else:
                     env.update({expr[1] : lispEval(expr[2], env)})
                 return notValue
@@ -137,14 +135,7 @@ def lispEval(expr, env):
                         newEnv.update({symbol : None})
 
                     arity = len(newEnv)
-
-                    body = expr[2][-1]
-                    
-                    for definition in expr[2][0:-1]:
-                        if definition:
-                            lispEval(definition[0], newEnv)
-
-                    #print(newEnv)
+                    body = expr[2]
 
                     def proc(args, env):
                         locEnv = dict(env)
@@ -179,7 +170,7 @@ def lispEval(expr, env):
                         except:
                             raise Exception("'let' is not recursive! Did you mean 'let*'?")
 
-                lamb = lispEval(["lambda", args, [body]], env)
+                lamb = lispEval(["lambda", args, body], env)
                 return lamb(argVals, env)
 
         # recursive let
@@ -212,7 +203,7 @@ def lispEval(expr, env):
                     except:
                         raise Exception("Recursive 'let' failed!")
                 
-                lamb = lispEval(["lambda", args, [body]], smallEnv)
+                lamb = lispEval(["lambda", args, body], smallEnv)
                 return lamb(argVals, smallEnv)
 
         elif expr[0] == "quote":
