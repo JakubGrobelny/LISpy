@@ -11,6 +11,27 @@ import re
 # deleting useless whitespace characters and comments
 def preparse(str):
 
+    # checking if brackets are correct
+
+    bracketStack = []
+    openingBrackets = ['(', '[', '{']
+    closingBrackets = [')', ']', '}']
+
+    for character in str:
+        if character in openingBrackets:
+            bracketStack.append(character)
+        elif character in closingBrackets:
+            index = closingBrackets.index(character)
+            if bracketStack[-1] != openingBrackets[index]:
+                raise Exception("Brackets do not match!")
+            else:
+                bracketStack.pop()
+
+    str = str.replace('[', '(')
+    str = str.replace('{', '(')
+    str = str.replace(']', ')')
+    str = str.replace('}', ')')
+
     # removing comments
     str = re.sub(r'\;.+\n', '', str)
 
@@ -40,7 +61,6 @@ def parse(str):
         nested = False
         nestCount = 0
         tempstr = ""
-        readingStr = False
 
         #TODO:
         # 1. do quotations
@@ -52,17 +72,8 @@ def parse(str):
             if (c != ' '):
 
                 tempstr += c
-                if c == '"':
-                    
-                    if not readingStr:
-                        readingStr = True
-                        
-                    else:
-                        readingStr = False
-                        result.append(tempstr)
-                        tempstr = ""
-
-                elif c == '(':
+                
+                if c == '(':
                     nested = True
                     nestCount += 1
 
@@ -73,12 +84,12 @@ def parse(str):
                         tempstr = ""
                         nested = False
 
-            elif not nested and not readingStr:
+            elif not nested:
                 if tempstr != "":
                     result.append(tempstr)
                     tempstr = ""
 
-            elif nested or readingStr:
+            elif nested:
                 tempstr += ' '
 
         if tempstr != "":
