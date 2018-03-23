@@ -170,6 +170,14 @@ def resetEnv(args, env):
         env.update(globalEnvInit())
     return notValue
 
+def printEnv(args, env):
+    if len(args):
+        raise Exception("!reset-env: arity mismatch!")
+    else:
+        for key in env:
+            print(str(key) + ": " + str(env[key]))
+        return notValue
+
 def evaluate(args, env):
     if len(args) != 1:
         raise Exception("eval: arity mismatch!")
@@ -221,6 +229,7 @@ def globalEnvInit():
             "!exit" : exit,  
             "!reset-env" : resetEnv,
             "!clear" : clear,
+            "!print-env" : printEnv,
             # eval
             "eval" : evaluate
                             }

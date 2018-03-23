@@ -16,7 +16,7 @@ from parser import reparse
 # list of special forms used to check whether an use of 'define' is legal
 notValue = "__!@not_a_value@!__"
 funcDefinitionsFlag = "__!@contains_definitions@!__"
-specialForms = ["define", "if", "cond", "and", "or", "lambda", "let", "quote", "λ"]
+specialForms = ["define", "if", "cond", "and", "or", "lambda", "let", "quote", "λ", "else"]
 specialValues = ["None", "False", "True"]
 basic = [int, float, pair, bool]
 
@@ -206,7 +206,10 @@ def lispEval(expr, env):
                 args = []
 
             try:
-                return op(args, env)
+                if isinstance(op, types.FunctionType):
+                    return op(args, env)
+                else:
+                    raise Exception(reparse(expr) + " is not a valid expression!")
             except:
                 raise Exception(op.__name__ + ": arity mismatch!")
 
@@ -214,6 +217,8 @@ def lispEval(expr, env):
         elif expr[0] in env:
             if isinstance(env[expr[0]], types.FunctionType):
                 return lispEval(expr[0], env)(expr[1:], env)
+            else:
+                raise Exception(reparse(expr) + " is not a valid expression!")
 
         # expression was invalid
         else:
