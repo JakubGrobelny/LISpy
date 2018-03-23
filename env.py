@@ -195,7 +195,8 @@ def isNumber(args, env):
     if len(args) != 1:
         raise Exception("number?: arity mismatch!")
     else:
-        return isInt(args[0]) or isFloat(args[0]) or (type(args[0]) in [float, int])
+        arg = lispEval(args[0], env)
+        return isInt(arg) or isFloat(arg) or (type(arg) in [float, int])
 
 def globalEnvInit():
     # build in definitions

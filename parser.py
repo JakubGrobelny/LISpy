@@ -27,6 +27,9 @@ def preparse(str):
             else:
                 bracketStack.pop()
 
+    if len(bracketStack):
+        raise Exception("Brackets do not match!")
+
     str = str.replace('[', '(')
     str = str.replace('{', '(')
     str = str.replace(']', ')')
