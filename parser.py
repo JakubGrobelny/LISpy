@@ -85,3 +85,21 @@ def parse(str):
             result.append(tempstr)
         
         return result
+
+def reparse(ls):
+    if isinstance(ls, list):
+        strn = "("
+        for element in ls:
+            strn += " " + reparse(element) + " "
+        strn += ")"
+
+        while "  " in strn:
+            strn = strn.replace("  ", " ")
+        while "( " in strn:
+            strn = strn.replace("( ", "(")
+        while " )" in strn:
+            strn = strn.replace(" )", ")")
+
+        return strn
+    else:
+        return str(ls)

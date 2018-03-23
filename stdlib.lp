@@ -11,6 +11,12 @@
 
 ;; Procedures
 
+(define false False)
+
+(define true True)
+
+(define null None)
+
 (define (null? x)
     (= x null))
 

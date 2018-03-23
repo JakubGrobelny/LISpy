@@ -7,6 +7,7 @@ import sys
 from pair import pair
 from parser import parse
 from parser import preparse
+from parser import reparse
 
 #####################
 #   EVAL FUNCTION   #
@@ -19,48 +20,47 @@ specialForms = ["define", "if", "cond", "and", "or", "lambda", "let", "quote", "
 specialValues = ["None", "False", "True"]
 basic = [int, float, pair, bool]
 
+def isInt(str):
+    try:
+        int(str)
+        return True
+    except:
+        return False
+
+def isFloat(str):
+    try:
+        float(str)
+        return True
+    except:
+        return False
+
+def isBool(str):
+    return str == "False" or str == "True" or str == False or str == True
+
+def isConstant(arg):
+    return isInt(arg) or isFloat(arg) or (type(arg) in basic) or isBool(arg) or (arg == None) or (arg == "None") or isinstance(arg, types.FunctionType)
+
 # evaluates given expression in given environment
 def lispEval(expr, env):
 
     # since every element in a list is a string at the beginning
     # we need to check if it's convertable to a certain type
-    def isInt(str):
-        try:
-            int(str)
-            return True
-        except:
-            return False
-
-    def isFloat(str):
-        try:
-            float(str)
-            return True
-        except:
-            return False
-
-    def isString(str):
-        try:
-            if str[0] == str[-1] == '"':
-                return True
-            return False
-        except:
-            return False
-
+    
     # if the expression is not a list
     if not isinstance(expr, list):
         if not expr in env:
             # basic types
             if type(expr) in basic:
                 return expr
-            if expr in specialForms:
+            elif expr in specialForms:
                 raise Exception("Invalid use of '" + expr + "'!")
             # boolean types
-            if expr == "false" or expr == "False":
+            elif expr == "False":
                 return False
-            if expr == "true" or expr == "True":
+            elif expr == "True":
                 return True
             # no value is "__!@not_a_value@!__"
-            if expr == "null" or expr == "None" or expr == None:
+            elif expr == "None" or expr == None:
                 return None
             # int (but still represented by string)
             elif isInt(expr):
@@ -81,7 +81,7 @@ def lispEval(expr, env):
             # Fix defines inside of another defines
             # Fix defines inside of lambdas
             #if len(expr) == 3:
-            if isFloat(expr[1]) or isInt(expr[1]) or isString(expr[1]) or expr[1] in specialValues:
+            if isFloat(expr[1]) or isInt(expr[1]) or expr[1] in specialValues:
                 raise Exception("Can not define a value!")
             elif expr[1] in specialForms:
                 raise Exception("Can not define a keyword!")
@@ -169,7 +169,10 @@ def lispEval(expr, env):
             if len(expr) != 2:
                 raise Exception("Invalid use of 'quote'")
             else:
-                return expr[1]
+                if isConstant(expr[1]):
+                    return lispEval(expr[1], env)
+                else:
+                    return reparse(expr[1])
 
         elif expr[0] == "if":
             if len(expr) != 4:

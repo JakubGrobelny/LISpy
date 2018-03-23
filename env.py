@@ -3,9 +3,14 @@
 # 2018
 
 import sys
-from leval import lispEval, notValue
+from leval import lispEval
+from leval import notValue
+from leval import isConstant
 from pair import pair
 from random import randint
+from parser import parse
+from parser import preparse
+import types
 
 # global variable used to determine whether the program should close
 end = False
@@ -119,11 +124,11 @@ def cdr(args, env):
         return lispEval(p.get(1), env)
 
 #TODO: change name
-def list(args, env):
+def makeList(args, env):
     if len(args) == 0:
         return None
     else:
-        return cons([args[0], list(args[1:], env)], env)
+        return cons([args[0], makeList(args[1:], env)], env)
 
 def isPair(args, env):
     if len(args) != 1:
@@ -164,6 +169,20 @@ def resetEnv(args, env):
         env.update(globalEnvInit())
     return notValue
 
+def evaluate(args, env):
+    if len(args) != 1:
+        raise Exception("eval: arity mismatch!")
+    else:
+        arg = lispEval(args[0], env)
+
+        if isConstant(arg):
+            return arg
+        # this method is cancerous but it works
+        try:
+            return lispEval(arg, env)
+        except:
+            return lispEval(parse(preparse(arg)), env)        
+
 def globalEnvInit():
 
     # build in definitions
@@ -177,7 +196,7 @@ def globalEnvInit():
             "cons" : cons,  
             "car" : car,    
             "cdr" : cdr,    
-            "list" : list,  
+            "list" : makeList,  
             "list?" : isList,
             "pair?" : isPair,
             "random" : rand,
@@ -187,5 +206,5 @@ def globalEnvInit():
             "!exit" : exit,  
             "!reset-env" : resetEnv,
             # eval
-            "eval" : lispEval#TODO: fix
+            "eval" : evaluate
                             }
