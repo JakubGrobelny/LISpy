@@ -2,14 +2,11 @@
 ; Jakub Grobelny
 ; 2018
 
-;; Constants
 (define PI 3.141592653589793)
 
-;; Macros
 (define mod modulo)
-(define % modulo)
 
-;; Procedures
+(define % modulo)
 
 (define false False)
 
@@ -43,6 +40,9 @@
 
 (define (caddr p)
     (car (cdr (cdr p))))
+
+(define (cdddar p)
+    (cdr (cdr (cdr (car p)))))
 
 (define (append xs ys)
     (if (null? xs)

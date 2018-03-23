@@ -77,10 +77,6 @@ def lispEval(expr, env):
     else:
         # checking for special forms first
         if expr[0] == "define":
-            #TODO:
-            # Fix defines inside of another defines
-            # Fix defines inside of lambdas
-            #if len(expr) == 3:
             if isFloat(expr[1]) or isInt(expr[1]) or expr[1] in specialValues:
                 raise Exception("Can not define a value!")
             elif expr[1] in specialForms:
@@ -96,13 +92,10 @@ def lispEval(expr, env):
                 else:
                     env.update({expr[1] : lispEval(expr[2], env)})
                 return notValue
-            #else:
-            #    raise Exception("Invalid use of 'define'!")
 
         elif expr[0] == "lambda" or expr[0] == "λ":
-            #if len(expr) == 3:
-            if not isinstance(expr[1], list):
-                raise ("Invalid use of 'lambda'!")
+            if not isinstance(expr[1], list) or len(expr) < 3:
+                raise Exception("Invalid use of 'lambda'!")
             else:
                 
                 # compressing definitions and stuff into one list to

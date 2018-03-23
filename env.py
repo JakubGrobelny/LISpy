@@ -6,6 +6,7 @@ import sys
 from leval import lispEval
 from leval import notValue
 from leval import isConstant
+from leval import isFloat, isInt
 from pair import pair
 from random import randint
 from parser import parse
@@ -183,8 +184,20 @@ def evaluate(args, env):
         except:
             return lispEval(parse(preparse(arg)), env)        
 
-def globalEnvInit():
+def clear(args, env):
+    if len(args):
+        raise Exception("!clear: arity mismatch!")
+    else:
+        print("\n" * 100)
+        return notValue
 
+def isNumber(args, env):
+    if len(args) != 1:
+        raise Exception("number?: arity mismatch!")
+    else:
+        return isInt(args[0]) or isFloat(args[0]) or (type(args[0]) in [float, int])
+
+def globalEnvInit():
     # build in definitions
     return {"+" : plus,     
             "-" : minus,    
@@ -199,12 +212,14 @@ def globalEnvInit():
             "list" : makeList,  
             "list?" : isList,
             "pair?" : isPair,
+            "number?" : isNumber,
             "random" : rand,
             "expt" : expt,
             # procedures with '!' as prefix shouldn't really be used
             # (except !exit)
             "!exit" : exit,  
             "!reset-env" : resetEnv,
+            "!clear" : clear,
             # eval
             "eval" : evaluate
                             }
