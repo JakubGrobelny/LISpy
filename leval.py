@@ -17,7 +17,7 @@ from parser import reparse
 notValue = "__!@not_a_value@!__"
 funcDefinitionsFlag = "__!@contains_definitions@!__"
 specialForms = ["define", "if", "cond", "and", "or", "lambda", "let", "quote", "λ", "else"]
-specialValues = ["None", "False", "True"]
+specialValues = ["None", "False", "True", notValue]
 basic = [int, float, pair, bool]
 
 def isInt(str):

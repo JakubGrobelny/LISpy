@@ -208,7 +208,8 @@ def isNumber(args, env):
 
 def globalEnvInit():
     # built in definitions
-    return {"+" : plus,     
+    return {"__!@not_a_value@!__" : None,
+            "+" : plus,     
             "-" : minus,    
             "*" : mult,     
             "/" : div,      
