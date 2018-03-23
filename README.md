@@ -18,6 +18,8 @@ Also it doesn't understand how strings work so don't bother.
 (or «expression» ... «expression») - returns true if any of the expressions is true  
 (lambda («arguments») «expression») - creates a function that returns «expression» and takes «arguments»  
 (λ («arguments») «expression») - same as above but with cool greek letter  
+(let ((«name» «definition») ...) «expression») - locally binds variables to their definitions and returns a value  
+(quote «expression») - returns the input as it is, without evaluation (quoted constants are themselves)  
   
 #Constants:  
   
