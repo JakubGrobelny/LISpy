@@ -15,7 +15,11 @@ import sys
 #    MAIN    #
 ##############
 
-def interpreter_loop():
+def printInfo():
+    print("LISpy version 0.1")
+    print("Type \"(!exit)\" to exit")
+
+def interpreterLoop():
 
     # dictionary used to represent global environment
     globalEnv = globalEnvInit()
@@ -57,6 +61,8 @@ def interpreter_loop():
         except:
             print("Failed to open " + sys.argv[1])
 
+    printInfo()
+
     # read-eval-print loop
     while not env.end:
         userInput = input(">>> ")
@@ -66,4 +72,4 @@ def interpreter_loop():
         except Exception as exc:
             print(exc)
 
-interpreter_loop()
+interpreterLoop()

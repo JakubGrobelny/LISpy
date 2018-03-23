@@ -181,7 +181,7 @@ def lispEval(expr, env):
                 if len(cond) != 2:
                     raise Exception("Invalid use of 'cond'!")
                 else:
-                    if lispEval(cond[0], env):
+                    if cond[0] == "else" or lispEval(cond[0], env):
                         return lispEval(cond[1], env)
 
         elif expr[0] == "and":

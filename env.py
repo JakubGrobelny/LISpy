@@ -199,7 +199,7 @@ def isNumber(args, env):
         return isInt(arg) or isFloat(arg) or (type(arg) in [float, int])
 
 def globalEnvInit():
-    # build in definitions
+    # built in definitions
     return {"+" : plus,     
             "-" : minus,    
             "*" : mult,     
